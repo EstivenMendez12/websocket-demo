@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+
+    <style>
+        #chat {
+            border: 1px solid black;
+            height: 200px;
+            overflow: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>WebSocket Chat</h2>
+
+    <label for="url">Servidor WebSocket:</label>
+    <input id="url" type="text"
+        value="wss://websocket-server-guambi971.dev.apps.rm3.7wse.p1.openshiftapps.com"
+        size="60">
+    <button onclick="connect()">Conectar</button>
+    <button onclick="disconnect()">Desconectar</button>
+
+    <br><br>
+
+    <label for="message">Mensaje:</label>
+    <input id="message" type="text" placeholder="Escribe un mensaje">
+    <button onclick="sendMessage()">Enviar</button>
+
+    <h3>Mensajes:</h3>
+    <div id="chat"></div>
+
+    <p>Enviados: <span id="sent">0</span></p>
+    <p>Recibidos: <span id="received">0</span></p>
+
+    <script>
+        let socket;
+        let sent = 0;
+        let received = 0;
+
+        function connect() {
+            const url = document.getElementById("url").value;
+            socket = new WebSocket(url);
+
+            socket.onopen = () => {
+                log("Conectado al servidor");
+            };
+
+            socket.onmessage = (event) => {
+                received++;
+                document.getElementById("received").innerText = received;
+                log("Recibido: " + event.data);
+            };
+
+            socket.onclose = () => {
+                log("Desconectado");
+            };
+        }
+
+        function disconnect() {
+            socket.close();
+        }
+
+        function sendMessage() {
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                alert("No estás conectado");
+                return;
+            }
+
+            const msg = document.getElementById("message").value;
+            socket.send(msg);
+            sent++;
+            document.getElementById("sent").innerText = sent;
+            log("Enviado: " + msg);
+        }
+
+        function log(message) {
+            const chat = document.getElementById("chat");
+            chat.innerHTML += message + "<br>";
+            chat.scrollTop = chat.scrollHeight;
+        }
+    </script>
+</body>
+</html>
