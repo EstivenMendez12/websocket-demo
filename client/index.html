@@ -1,87 +1,120 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebSocket Chat</title>
 
-    <style>
-        #chat {
-            border: 1px solid black;
-            height: 200px;
-            overflow: auto;
-        }
-    </style>
+```
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    #chat {
+        border: 1px solid black;
+        height: 250px;
+        overflow: auto;
+        padding: 10px;
+        background: #f9f9f9;
+    }
+
+    input, button {
+        padding: 5px;
+        margin: 5px 0;
+    }
+
+    .status {
+        font-weight: bold;
+    }
+</style>
+```
+
 </head>
 
 <body>
-    <h2>WebSocket Chat</h2>
+    <h2>WebSocket Chat 🚀</h2>
 
-    <label for="url">Servidor WebSocket:</label>
-    <input id="url" type="text"
-        value="wss://websocket-server-guambi971.dev.apps.rm3.7wse.p1.openshiftapps.com"
-        size="60">
-    <button onclick="connect()">Conectar</button>
-    <button onclick="disconnect()">Desconectar</button>
+```
+<label for="url">Servidor WebSocket:</label>
+<input id="url" type="text"
+    value="wss://websocket-server-estivenm35-crt-dev.apps.rm3.7wse.p1.openshiftapps.com"
+    size="70">
+<button onclick="connect()">Conectar</button>
+<button onclick="disconnect()">Desconectar</button>
 
-    <br><br>
+<p class="status" id="status">Estado: Desconectado ❌</p>
 
-    <label for="message">Mensaje:</label>
-    <input id="message" type="text" placeholder="Escribe un mensaje">
-    <button onclick="sendMessage()">Enviar</button>
+<br>
 
-    <h3>Mensajes:</h3>
-    <div id="chat"></div>
+<label for="message">Mensaje:</label>
+<input id="message" type="text" placeholder="Escribe un mensaje">
+<button onclick="sendMessage()">Enviar</button>
 
-    <p>Enviados: <span id="sent">0</span></p>
-    <p>Recibidos: <span id="received">0</span></p>
+<h3>Mensajes:</h3>
+<div id="chat"></div>
 
-    <script>
-        let socket;
-        let sent = 0;
-        let received = 0;
+<p>Enviados: <span id="sent">0</span></p>
+<p>Recibidos: <span id="received">0</span></p>
 
-        function connect() {
-            const url = document.getElementById("url").value;
-            socket = new WebSocket(url);
+<script>
+    let socket;
+    let sent = 0;
+    let received = 0;
 
-            socket.onopen = () => {
-                log("Conectado al servidor");
-            };
+    function connect() {
+        const url = document.getElementById("url").value;
+        socket = new WebSocket(url);
 
-            socket.onmessage = (event) => {
-                received++;
-                document.getElementById("received").innerText = received;
-                log("Recibido: " + event.data);
-            };
+        socket.onopen = () => {
+            document.getElementById("status").innerText = "Estado: Conectado ✅";
+            log("🟢 Conectado al servidor");
+        };
 
-            socket.onclose = () => {
-                log("Desconectado");
-            };
-        }
+        socket.onmessage = (event) => {
+            received++;
+            document.getElementById("received").innerText = received;
+            log("📩 Recibido: " + event.data);
+        };
 
-        function disconnect() {
+        socket.onclose = () => {
+            document.getElementById("status").innerText = "Estado: Desconectado ❌";
+            log("🔴 Desconectado");
+        };
+
+        socket.onerror = (error) => {
+            log("⚠️ Error en la conexión");
+            console.error(error);
+        };
+    }
+
+    function disconnect() {
+        if (socket) {
             socket.close();
         }
+    }
 
-        function sendMessage() {
-            if (!socket || socket.readyState !== WebSocket.OPEN) {
-                alert("No estás conectado");
-                return;
-            }
-
-            const msg = document.getElementById("message").value;
-            socket.send(msg);
-            sent++;
-            document.getElementById("sent").innerText = sent;
-            log("Enviado: " + msg);
+    function sendMessage() {
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            alert("No estás conectado");
+            return;
         }
 
-        function log(message) {
-            const chat = document.getElementById("chat");
-            chat.innerHTML += message + "<br>";
-            chat.scrollTop = chat.scrollHeight;
-        }
-    </script>
+        const msg = document.getElementById("message").value;
+        socket.send(msg);
+        sent++;
+        document.getElementById("sent").innerText = sent;
+        log("📤 Enviado: " + msg);
+    }
+
+    function log(message) {
+        const chat = document.getElementById("chat");
+        chat.innerHTML += message + "<br>";
+        chat.scrollTop = chat.scrollHeight;
+    }
+</script>
+```
+
 </body>
 </html>
